@@ -141,7 +141,7 @@ export class LoginPage extends HelperBase {
     }
 
     public getErrorMessage(): Locator {
-        return this.errorMessage;
+        return this.errorMessage.first();
     }
 
     public getInvalidEmailPassWarningText(): Locator {
