@@ -108,7 +108,7 @@ This project is licensed under the ISC License.
 
 ## 👥 Author
 
-- **Software QA Engineer Ugur** 
+- **Software QA Engineer Ugur Yaman** 
 
 ## 🔄 Future Improvements
 
