@@ -1,0 +1,210 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Verify Unsuccessful Login with Invalid Username
+- Location: C:\Users\User\Desktop\yeni\tests\TC_Login_021.spec.ts:7:1
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Sign In' })
+    - locator resolved to <button type="submit" class="btn btn-primary">Sign In</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    28 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+    at LoginPage.clickSignInButton (C:\Users\User\Desktop\yeni\page-objects\loginPage.ts:60:33)
+    at C:\Users\User\Desktop\yeni\tests\TC_Login_021.spec.ts:18:38
+```
+
+# Test source
+
+```ts
+   1 | import { Page, Locator, FrameLocator } from '@playwright/test';
+   2 | import { expect } from '@playwright/test';
+   3 | import { HelperBase } from './helperBase';
+   4 | import { Resources } from '../env/resources';
+   5 | import { LoginBody } from '../pojos/loginBody';
+   6 |
+   7 | export class LoginPage extends HelperBase {
+   8 |     // Locators
+   9 |     private readonly emailInput: Locator;
+   10 |     private readonly passwordInput: Locator;
+   11 |     private readonly loginButton: Locator;
+   12 |     private readonly invalidEmailPassWarningText: Locator;
+   13 |     private readonly errorMessage: Locator;
+   14 |     private readonly keepMeCheckbox: Locator;
+   15 |     private readonly signInButton: Locator;
+   16 |     private readonly forgotPasswordLink: Locator;
+   17 |     private readonly doNotHaveAccountLink: Locator;
+   18 |     private readonly loginForm: Locator;
+   19 |     private readonly logo: Locator;
+   20 |     private readonly contactUsLink: Locator;
+   21 |     private readonly copyrightText: Locator;
+   22 |     private readonly recaptchaFrame: Locator;
+   23 |     private readonly registrationOrg: Locator;
+   24 |
+   25 |     constructor(page: Page) {
+   26 |         super(page);
+   27 |         
+   28 |         // Initialize locators
+   29 |         this.emailInput = page.locator('input[name="email"]');
+   30 |         this.passwordInput = page.locator('input[name="password"]');
+   31 |         this.loginButton = page.getByRole('button', { name: 'Sign In' });
+   32 |         this.invalidEmailPassWarningText = page.locator('.alert.alert-danger');
+   33 |         this.errorMessage = page.getByText('Error during login');
+   34 |         this.keepMeCheckbox = page.getByText('Keep me signed in');
+   35 |         this.signInButton = page.getByRole('button', { name: 'Sign In' });
+   36 |         this.forgotPasswordLink = page.getByText('Forgot your password?');
+   37 |         this.doNotHaveAccountLink = page.getByRole('link', { name: 'Do not have an account?' });
+   38 |         this.loginForm = page.locator('form');
+   39 |         this.logo = page.getByText('logo');
+   40 |         this.contactUsLink = page.getByText('Contact us');
+   41 |         this.copyrightText = page.getByText('NinjaOne LLC © 2014-');
+   42 |         this.recaptchaFrame = page.locator('iframe[title="reCAPTCHA"]').first();
+   43 |         this.registrationOrg = page.getByText('RegistrationOrganizationFirst');
+   44 |     }
+   45 |
+   46 |     /**
+   47 |      * Loads the login page
+   48 |      */
+   49 |     public async loadPage(): Promise<void> {
+   50 |         await this.page.goto(Resources.LOGIN_URL);
+   51 |         await this.page.waitForLoadState('domcontentloaded');
+   52 |         await this.page.waitForLoadState('networkidle', { timeout: 15000 });
+   53 |         await this.page.waitForSelector('form', { timeout: 10000 });
+   54 |     }
+   55 |   
+   56 |     /**
+   57 |      * Clicks the sign in button
+   58 |      */
+   59 |     public async clickSignInButton(): Promise<void> {
+>  60 |         await this.signInButton.click();
+      |                                 ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
+   61 |         await this.page.waitForLoadState('domcontentloaded');
+   62 |         await this.page.waitForLoadState('networkidle', { timeout: 10000 });
+   63 |     }
+   64 |
+   65 |     /**
+   66 |      * Clicks the "Keep me signed in" checkbox
+   67 |      */
+   68 |     public async clickKeepMeCheckbox(): Promise<void> {
+   69 |         await this.keepMeCheckbox.click();
+   70 |     }
+   71 |
+   72 |     /**
+   73 |      * Clicks the forgot password link
+   74 |      */
+   75 |     public async clickForgotPasswordLink(): Promise<void> {
+   76 |         await this.forgotPasswordLink.click();
+   77 |     }
+   78 |
+   79 |      /**
+   80 |      * Performs login with given credentials
+   81 |      * @param email - The email to login with
+   82 |      * @param password - The password to login with
+   83 |      */
+   84 |     public async fillLoginForm(user:LoginBody):Promise<void>{
+   85 |         await this.emailInput.fill(user.getEmail());
+   86 |         await this.passwordInput.fill(user.getPassword());
+   87 |     }
+   88 |
+   89 |
+   90 |     // Getter methods
+   91 |     public getEmailInput(): Locator {
+   92 |         return this.emailInput;
+   93 |     }
+   94 |
+   95 |     public getPasswordInput(): Locator {
+   96 |         return this.passwordInput;
+   97 |     }
+   98 |
+   99 |     public getLoginButton(): Locator {
+  100 |         return this.loginButton;
+  101 |     }
+  102 |
+  103 |     public getSignInButton(): Locator {
+  104 |         return this.signInButton;
+  105 |     }
+  106 |
+  107 |     public getKeepMeCheckbox(): Locator {
+  108 |         return this.keepMeCheckbox;
+  109 |     }
+  110 |
+  111 |     public getForgotPasswordLink(): Locator {
+  112 |         return this.forgotPasswordLink;
+  113 |     }
+  114 |
+  115 |     public getDoNotHaveAccountLink(): Locator {
+  116 |         return this.doNotHaveAccountLink;
+  117 |     }
+  118 |
+  119 |     public getContactUsLink(): Locator {
+  120 |         return this.contactUsLink;
+  121 |     }
+  122 |
+  123 |     public getCopyrightText(): Locator {
+  124 |         return this.copyrightText;
+  125 |     }
+  126 |
+  127 |     public getRecaptchaFrame(): Locator {
+  128 |         return this.recaptchaFrame;
+  129 |     }
+  130 |
+  131 |     public getRegistrationOrg(): Locator {
+  132 |         return this.registrationOrg;
+  133 |     }
+  134 |
+  135 |     public getLoginForm(): Locator {
+  136 |         return this.loginForm;
+  137 |     }
+  138 |
+  139 |     public getLogo(): Locator {
+  140 |         return this.logo;
+  141 |     }
+  142 |
+  143 |     public getErrorMessage(): Locator {
+  144 |         return this.errorMessage;
+  145 |     }
+  146 |
+  147 |     public getInvalidEmailPassWarningText(): Locator {
+  148 |         return this.invalidEmailPassWarningText;
+  149 |     }
+  150 |
+  151 |     /**
+  152 |      * Checks if the login form is visible
+  153 |      * @returns Promise<boolean> - Whether the login form is visible
+  154 |      */
+  155 |     public async isLoginFormVisible(): Promise<boolean> {
+  156 |         return await this.loginForm.isVisible();
+  157 |     }
+  158 |
+  159 |     /**
+  160 |      * Checks if the error message is visible
+```

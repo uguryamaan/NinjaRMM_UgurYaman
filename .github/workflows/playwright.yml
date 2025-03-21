@@ -1,0 +1,152 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * *'  # Her gün gece yarısı çalıştır
+  workflow_dispatch:  # Manuel tetikleme için eklendi
+
+env:
+  TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+  TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+  API_KEY: ${{ secrets.API_KEY }}
+  BASE_URL: ${{ secrets.BASE_URL }}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+    
+    - name: Create test directories
+      run: |
+        mkdir -p test-results
+        mkdir -p playwright-report
+        mkdir -p allure-results
+        mkdir -p allure-report
+    
+    - name: Run Playwright tests
+      run: npx playwright test tests --project=chromium --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} || true
+      env:
+        TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+        TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+        API_KEY: ${{ secrets.API_KEY }}
+        BASE_URL: ${{ secrets.BASE_URL }}
+    
+    - name: List test results directory
+      run: ls -la test-results/
+    
+    - name: List playwright report directory
+      run: ls -la playwright-report/
+    
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    
+    - name: Setup Allure Report
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      id: allure-report
+      with:
+        allure_results: allure-results
+        allure_report: allure-report
+        gh_pages: gh-pages
+        allure_history: allure-history
+    
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.shardIndex }}
+        path: playwright-report/
+        retention-days: 30
+        if-no-files-found: warn
+    
+    - name: Upload Allure Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report-${{ matrix.shardIndex }}
+        path: allure-report/
+        retention-days: 30
+        if-no-files-found: warn
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.shardIndex }}
+        path: test-results/
+        retention-days: 30
+        if-no-files-found: warn
+
+  deploy-reports:
+    if: always()
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        pattern: "*-report-*"
+        merge-multiple: true
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Create combined reports directory
+      run: |
+        mkdir -p test-reports
+        mkdir -p test-reports/playwright
+        mkdir -p test-reports/allure
+        cp -r artifacts/playwright-report/* test-reports/playwright/ || true
+        cp -r artifacts/allure-report/* test-reports/allure/ || true
+        echo "<html><head><title>Test Reports</title></head><body><h1>Test Reports</h1><ul><li><a href='playwright/'>Playwright Report</a></li><li><a href='allure/'>Allure Report</a></li></ul></body></html>" > test-reports/index.html
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: test-reports
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

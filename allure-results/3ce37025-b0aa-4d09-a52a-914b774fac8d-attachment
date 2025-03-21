@@ -1,0 +1,87 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Verify Access to the Registration Page
+- Location: C:\Users\User\Desktop\yeni\tests\TC_Login_020.spec.ts:7:1
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('link', { name: 'Do not have an account?' })
+    - locator resolved to <a href="#/register">Do not have an account?</a>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <a href="#/resetPassword">Forgot your password?</a> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    7 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+      - waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <a href="#/resetPassword">Forgot your password?</a> intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+      - waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+      - waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+
+    at C:\Users\User\Desktop\yeni\tests\TC_Login_020.spec.ts:12:62
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '../fixtures/ui-fixture';
+   2 | import DataManager from '../env/dataManager';
+   3 |
+   4 | /**
+   5 |  * Test case: Verify that new users can access the registration page
+   6 |  */
+   7 | test('Verify Access to the Registration Page', async ({ pageManager }) => {
+   8 |   // 1. Navigate to login page
+   9 |   await pageManager.getLoginPage().loadPage();
+  10 |   
+  11 |   // 2. Click on "Do not have an account?" link
+> 12 |   await pageManager.getLoginPage().getDoNotHaveAccountLink().click();
+     |                                                              ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
+  13 |   
+  14 |   // 3. Verify redirection to registration page
+  15 |   const currentUrl = await pageManager.getLoginPage().getCurrentUrl();
+  16 |   expect(currentUrl).toContain(DataManager.resources.REGISTER_URL);
+  17 | });
+```

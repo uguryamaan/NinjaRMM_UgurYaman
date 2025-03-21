@@ -1,0 +1,8 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","7440","should verify reCAPTCHA iframe presence","chromium","Thu Mar 20 13:23:10 CET 2025","passed","Thu Mar 20 13:23:17 CET 2025","Verify Clickability of Fields and Buttons on the Login Page","test-1.spec.ts","",""
+"","7214","Verify Successful Login with a Valid Username and Password (First-Time User)","chromium","Thu Mar 20 13:23:17 CET 2025","failed","Thu Mar 20 13:23:24 CET 2025","","test-2.spec.ts","",""
+"","6734","Verify Access to the Registration Page","chromium","Thu Mar 20 13:23:25 CET 2025","passed","Thu Mar 20 13:23:31 CET 2025","","test-4.spec.ts","",""
+"","7141","Verify Access to Password Reset Page","chromium","Thu Mar 20 13:23:17 CET 2025","passed","Thu Mar 20 13:23:24 CET 2025","","test-3.spec.ts","",""
+"","7889","should verify keep me signed in checkbox functionality","chromium","Thu Mar 20 13:23:09 CET 2025","passed","Thu Mar 20 13:23:17 CET 2025","Verify Clickability of Fields and Buttons on the Login Page","test-1.spec.ts","",""
+"","7525","should verify password field functionality","chromium","Thu Mar 20 13:23:02 CET 2025","passed","Thu Mar 20 13:23:09 CET 2025","Verify Clickability of Fields and Buttons on the Login Page","test-1.spec.ts","",""
+"","7254","should verify email field functionality","chromium","Thu Mar 20 13:23:02 CET 2025","passed","Thu Mar 20 13:23:09 CET 2025","Verify Clickability of Fields and Buttons on the Login Page","test-1.spec.ts","",""

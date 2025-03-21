@@ -1,0 +1,2 @@
+Windows Security popup görünmedi veya otomatik olarak kabul edildi
+Current URL: https://app.ninjarmm.com/auth/#/login/

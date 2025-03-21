@@ -1,0 +1,60 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Verify Successful Login with a Valid Username and Password (First-Time User)
+- Location: C:\Users\User\Desktop\ninjarmugu\tests\test-2.spec.ts:4:1
+
+# Error details
+
+```
+Error: expect(received).toContain(expected) // indexOf
+
+Expected substring: "/mfa"
+Received string:    "https://app.ninjarmm.com/auth/#/login/"
+    at C:\Users\User\Desktop\ninjarmugu\tests\test-2.spec.ts:17:24
+```
+
+# Page snapshot
+
+```yaml
+- link "logo":
+  - img "logo"
+- heading "Multi-Factor Authentication" [level=2]
+- text: Hardware-Based Security Key
+- textbox
+- text: Insert security key and activate (if applicable) NinjaOne LLC © 2014-2025
+- link "Contact us"
+- dialog
+- dialog
+- dialog
+- dialog
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '../fixtures/ui-fixture';
+   2 | import DataManager from '../env/dataManager';
+   3 |
+   4 | test('Verify Successful Login with a Valid Username and Password (First-Time User)', async ({ pageManager }) => {
+   5 |     // 1. Login sayfasına git
+   6 |     await pageManager.getLoginPage().loadPage();
+   7 |     await expect(pageManager.getLoginPage().getLoginForm()).toBeVisible();
+   8 |
+   9 |     // 2. Geçerli email ve password gir
+  10 |     await pageManager.getLoginPage().fillLoginForm(DataManager.testData.getValidLoginBody());
+  11 |
+  12 |     // 4. "Sign In" butonuna tıkla
+  13 |     await pageManager.getLoginPage().clickSignInButton();
+  14 |
+  15 |     // 5. MFA Setup sayfasına yönlendirildiğini kontrol et
+  16 |     const currentUrl = await pageManager.getLoginPage().getCurrentUrl();
+> 17 |     expect(currentUrl).toContain('/mfa');
+     |                        ^ Error: expect(received).toContain(expected) // indexOf
+  18 | });
+```

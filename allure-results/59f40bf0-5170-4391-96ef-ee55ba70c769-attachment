@@ -1,0 +1,90 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Verify Unsuccessful Login with Invalid Username and Password
+- Location: C:\Users\User\Desktop\ninjarmugu\tests\test-7.spec.ts:6:1
+
+# Error details
+
+```
+Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
+
+Locator: getByText('Error during login')
+Expected: visible
+Received: <element(s) not found>
+Call log:
+  - expect.toBeVisible with timeout 10000ms
+  - waiting for getByText('Error during login')
+
+    at C:\Users\User\Desktop\ninjarmugu\tests\test-7.spec.ts:27:32
+```
+
+# Page snapshot
+
+```yaml
+- link "logo":
+  - img "logo"
+- heading [level=2]
+- text: Invalid username/password. Please contact your system administrator for assistance. Email
+- textbox: Cora.Tromp@gmail.com
+- text: Password
+- textbox: 1rJGV6yUFoHjJDR
+- checkbox "Keep me signed in"
+- text: Keep me signed in
+- button "Sign In"
+- link "Forgot your password?"
+- link "Do not have an account?"
+- text: NinjaOne LLC © 2014-2025
+- link "Contact us"
+- dialog
+- dialog
+- dialog
+- dialog
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '../fixtures/ui-fixture';
+   2 | import DataManager from '../env/dataManager';
+   3 |
+   4 |
+   5 |
+   6 | test('Verify Unsuccessful Login with Invalid Username and Password', async ({ pageManager }) => {
+   7 |     // 1. Login sayfasına git
+   8 |     await pageManager.getLoginPage().loadPage();
+   9 |     await expect(pageManager.getLoginPage().getLoginForm()).toBeVisible();
+  10 |
+  11 |     // 2. Geçersiz email ve geçersiz password gir
+  12 |     const invalidEmail = DataManager.testEnvironment.getFakeEmail();
+  13 |     const invalidPassword = DataManager.testEnvironment.getFakePassword();
+  14 |     console.log('Login attempt with invalid email:', invalidEmail);
+  15 |     
+  16 |     await pageManager.getLoginPage().getEmailInput().fill(invalidEmail);
+  17 |     await pageManager.getLoginPage().getPasswordInput().fill(invalidPassword);
+  18 |
+  19 |     // 3. "Sign In" butonuna tıkla
+  20 |     await pageManager.getLoginPage().clickSignInButton();
+  21 |
+  22 |     // 4. Sayfa yüklenmesini bekle
+  23 |     await pageManager.getPage().waitForLoadState('networkidle');
+  24 |
+  25 |     // 5. Hata mesajının görünür olduğunu kontrol et
+  26 |     const errorMessage = pageManager.getLoginPage().getErrorMessage();
+> 27 |     await expect(errorMessage).toBeVisible();
+     |                                ^ Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
+  28 |     
+  29 |     // 6. Hata mesajının doğru olduğunu kontrol et
+  30 |     const errorText = await errorMessage.textContent();
+  31 |     expect(errorText).toContain('Invalid username/password');
+  32 |
+  33 |     // 7. Kullanıcının hala login sayfasında olduğunu kontrol et
+  34 |     const currentUrl = await pageManager.getLoginPage().getCurrentUrl();
+  35 |     expect(currentUrl).toContain(DataManager.resources.LOGIN_URL);
+  36 | });
+```

@@ -1,0 +1,117 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Verify Clickability of Fields and Buttons on the Login Page >> should verify email field functionality
+- Location: C:\Users\User\Desktop\yeni\tests\TC_Login_001.spec.ts:22:5
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('input[name="email"]')
+    - locator resolved to <input value="" type="text" name="email" class="form-control" autocomplete="username"/>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    28 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div class="css-1tzvko6 e3msq383">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+    at C:\Users\User\Desktop\yeni\tests\TC_Login_001.spec.ts:26:26
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '../fixtures/ui-fixture';
+   2 | import DataManager from '../env/dataManager';
+   3 |
+   4 | /**
+   5 |  * Test suite for verifying the functionality of login page elements
+   6 |  * This suite checks the clickability and functionality of all input fields and buttons
+   7 |  */
+   8 | test.describe('Verify Clickability of Fields and Buttons on the Login Page', () => {
+   9 |     let loginPage;
+  10 |
+  11 |     // Setup before each test
+  12 |     test.beforeEach(async ({ pageManager }) => {
+  13 |         loginPage = pageManager.getLoginPage();
+  14 |         await loginPage.loadPage();
+  15 |         await expect(loginPage.getLoginForm()).toBeVisible();
+  16 |     });
+  17 |
+  18 |     /**
+  19 |      * Test case: Email field functionality
+  20 |      * Verifies that the email input field is visible, enabled, and accepts input
+  21 |      */
+  22 |     test('should verify email field functionality', async ({ pageManager }) => {
+  23 |         const emailInput = loginPage.getEmailInput();
+  24 |         await expect(emailInput).toBeVisible();
+  25 |         await expect(emailInput).toBeEnabled();
+> 26 |         await emailInput.click();
+     |                          ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
+  27 |         const email:string = DataManager.testEnvironment.getValidEmail();
+  28 |         await emailInput.fill(email);
+  29 |         await expect(emailInput).toHaveValue(email);
+  30 |     });
+  31 |
+  32 |     /**
+  33 |      * Test case: Password field functionality
+  34 |      * Verifies that the password input field is visible, enabled, and accepts input
+  35 |      */
+  36 |     test('should verify password field functionality', async ({ pageManager }) => {
+  37 |         const passwordInput = loginPage.getPasswordInput();
+  38 |         await expect(passwordInput).toBeVisible();
+  39 |         await expect(passwordInput).toBeEnabled();
+  40 |         await passwordInput.click();
+  41 |         const password:string = DataManager.testEnvironment.getValidPassword();
+  42 |         await passwordInput.fill(password);
+  43 |         await expect(passwordInput).toHaveValue(password);
+  44 |     });
+  45 |
+  46 |     /**
+  47 |      * Test case: Keep me signed in checkbox functionality
+  48 |      * Verifies that the checkbox is visible, enabled, and can be checked
+  49 |      */
+  50 |     test('should verify keep me signed in checkbox functionality', async ({ pageManager }) => {
+  51 |         const keepMeCheckbox = loginPage.getKeepMeCheckbox();
+  52 |         await expect(keepMeCheckbox).toBeVisible();
+  53 |         await expect(keepMeCheckbox).toBeEnabled();
+  54 |         await keepMeCheckbox.click();
+  55 |         await expect(keepMeCheckbox).toBeChecked();
+  56 |     });
+  57 |
+  58 |     /**
+  59 |      * Test case: ReCAPTCHA iframe presence
+  60 |      * Verifies that the reCAPTCHA iframe is present and has the correct source
+  61 |      */
+  62 |     test('should verify reCAPTCHA iframe presence', async () => {
+  63 |         const recaptchaFrame = loginPage.getRecaptchaFrame();
+  64 |         await expect(recaptchaFrame).toBeVisible({ timeout: 30000 });
+  65 |         const iframeSrc = await recaptchaFrame.getAttribute('src');
+  66 |         expect(iframeSrc).toContain('recaptcha.net/recaptcha');
+  67 |     });
+  68 | });
+```

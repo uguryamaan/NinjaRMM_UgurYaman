@@ -1,0 +1,86 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Login Test with an Empty Password
+- Location: C:\Users\User\Desktop\yeni\tests\TC_Login_025.spec.ts:7:1
+
+# Error details
+
+```
+Error: expect.toBeVisible: Error: strict mode violation: getByText('Error during login') resolved to 2 elements:
+    1) <div display="flex" font-size="14" class="css-1cfrmkq eu2udwo9">Error during login</div> aka getByText('Error during login').first()
+    2) <div display="flex" font-size="14" class="css-1cfrmkq eu2udwo9">Error during login</div> aka getByText('Error during login').nth(1)
+
+Call log:
+  - expect.toBeVisible with timeout 10000ms
+  - waiting for getByText('Error during login')
+
+    at C:\Users\User\Desktop\yeni\tests\TC_Login_025.spec.ts:22:32
+```
+
+# Page snapshot
+
+```yaml
+- link "logo":
+  - img "logo"
+- heading [level=2]
+- text: Email
+- textbox: ugur.yamaan@gmail.com
+- text: Password
+- textbox
+- checkbox "Keep me signed in"
+- text: Keep me signed in
+- button "Sign In"
+- link "Forgot your password?"
+- link "Do not have an account?"
+- text: NinjaOne LLC © 2014-2025
+- link "Contact us"
+- dialog
+- dialog
+- dialog
+- dialog
+- alert: Error during login
+- alert: Error during login
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '../fixtures/ui-fixture';
+   2 | import DataManager from '../env/dataManager';
+   3 |
+   4 | /**
+   5 |  * Test case: Verify that login fails with empty password field
+   6 |  */
+   7 | test('Login Test with an Empty Password', async ({ pageManager }) => {
+   8 |     // 1. Navigate to login page
+   9 |     await pageManager.getLoginPage().loadPage();
+  10 |     await expect(pageManager.getLoginPage().getLoginForm()).toBeVisible();
+  11 |
+  12 |     // 2. Leave password field empty and enter valid email
+  13 |     const validEmail = DataManager.testEnvironment.getValidEmail();
+  14 |     await pageManager.getLoginPage().getEmailInput().fill(validEmail);
+  15 |     console.log('Login attempt with empty Password and valid email');
+  16 |
+  17 |     // 3. Click "Sign In" button
+  18 |     await pageManager.getLoginPage().clickSignInButton();
+  19 |
+  20 |     // 4. Verify error message is visible
+  21 |     const errorMessage = pageManager.getLoginPage().getErrorMessage();
+> 22 |     await expect(errorMessage).toBeVisible();
+     |                                ^ Error: expect.toBeVisible: Error: strict mode violation: getByText('Error during login') resolved to 2 elements:
+  23 |     
+  24 |     // 5. Verify error message content
+  25 |     const errorText = await errorMessage.textContent();
+  26 |     expect(errorText).toContain(DataManager.warnText.getloginErrorText());
+  27 |
+  28 |     // 6. Verify user remains on login page
+  29 |     const currentUrl = await pageManager.getLoginPage().getCurrentUrl();
+  30 |     expect(currentUrl).toContain(DataManager.resources.LOGIN_URL);
+  31 | });
+```

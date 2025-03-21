@@ -1,0 +1,83 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Verify Unsuccessful Login with Invalid Password
+- Location: C:\Users\User\Desktop\ninjarmugu\tests\test-6.spec.ts:5:1
+
+# Error details
+
+```
+Error: expect(received).toContain(expected) // indexOf
+
+Expected substring: "Human verification failed. Please try again or contact your system administrator for assistance."
+Received string:    "Invalid username/password. Please contact your system administrator for assistance."
+    at C:\Users\User\Desktop\ninjarmugu\tests\test-6.spec.ts:29:23
+```
+
+# Page snapshot
+
+```yaml
+- link "logo":
+  - img "logo"
+- heading [level=2]
+- text: Invalid username/password. Please contact your system administrator for assistance. Email
+- textbox: ugur.yamaan@gmail.com
+- text: Password
+- textbox: N09Eh39KMU9rz02
+- checkbox "Keep me signed in"
+- text: Keep me signed in
+- button "Sign In"
+- link "Forgot your password?"
+- link "Do not have an account?"
+- text: NinjaOne LLC © 2014-2025
+- link "Contact us"
+- dialog
+- dialog
+- dialog
+- dialog
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '../fixtures/ui-fixture';
+   2 | import DataManager from '../env/dataManager';
+   3 |
+   4 |
+   5 | test('Verify Unsuccessful Login with Invalid Password', async ({ pageManager }) => {
+   6 |     // 1. Login sayfasına git
+   7 |     await pageManager.getLoginPage().loadPage();
+   8 |     await expect(pageManager.getLoginPage().getLoginForm()).toBeVisible();
+   9 |
+  10 |     // 2. Geçerli email ve geçersiz password gir
+  11 |     const validEmail = DataManager.testData.getValidLoginBody().getEmail();
+  12 |     const invalidPassword = DataManager.testData.getFakeLoginBody().getPassword();
+  13 |     await pageManager.getLoginPage().getEmailInput().fill(validEmail);
+  14 |     await pageManager.getLoginPage().getPasswordInput().fill(invalidPassword);
+  15 |     console.log('Login attempt with valid email:', validEmail);
+  16 |
+  17 |     // 3. "Sign In" butonuna tıkla
+  18 |     await pageManager.getLoginPage().clickSignInButton();
+  19 |
+  20 |     // 4. Sayfa yüklenmesini bekle
+  21 |     await pageManager.getPage().waitForLoadState('networkidle');
+  22 |
+  23 |     // 5. Hata mesajının görünür olduğunu kontrol et
+  24 |     const errorMessage = pageManager.getLoginPage().getInvalidEmailPassWarningText();
+  25 |     await expect(errorMessage).toBeVisible();
+  26 |     
+  27 |     // 6. Hata mesajının doğru olduğunu kontrol et
+  28 |     const errorText = await errorMessage.textContent();
+> 29 |     expect(errorText).toContain(DataManager.warnText.getInvalidEmailPassWarningText());
+     |                       ^ Error: expect(received).toContain(expected) // indexOf
+  30 |
+  31 |     // 7. Kullanıcının hala login sayfasında olduğunu kontrol et
+  32 |     const currentUrl = await pageManager.getLoginPage().getCurrentUrl();
+  33 |     expect(currentUrl).toContain(DataManager.resources.LOGIN_URL);
+  34 | });
+```

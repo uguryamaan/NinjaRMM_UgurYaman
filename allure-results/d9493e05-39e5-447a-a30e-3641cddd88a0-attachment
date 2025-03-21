@@ -1,0 +1,66 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Verify Successful Login with a Valid Username and Password (First-Time User)
+- Location: C:\Users\User\Desktop\yeni\tests\test-2.spec.ts:7:1
+
+# Error details
+
+```
+Error: expect(received).toContain(expected) // indexOf
+
+Expected substring: "/mfa"
+Received string:    "https://app.ninjarmm.com/auth/#/login/"
+    at C:\Users\User\Desktop\yeni\tests\test-2.spec.ts:23:24
+```
+
+# Page snapshot
+
+```yaml
+- link "logo":
+  - img "logo"
+- heading "Multi-Factor Authentication" [level=2]
+- text: Hardware-Based Security Key
+- textbox
+- text: Insert security key and activate (if applicable) NinjaOne LLC © 2014-2025
+- link "Contact us"
+- dialog
+- dialog
+- dialog
+- dialog
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '../fixtures/ui-fixture';
+   2 | import DataManager from '../env/dataManager';
+   3 |
+   4 | /**
+   5 |  * Test case: Verify successful login for a first-time user with valid credentials
+   6 |  */
+   7 | test('Verify Successful Login with a Valid Username and Password (First-Time User)', async ({ pageManager }) => {
+   8 |     // 1. Navigate to login page
+   9 |     await pageManager.getLoginPage().loadPage();
+  10 |     await expect(pageManager.getLoginPage().getLoginForm()).toBeVisible();
+  11 |
+  12 |     // 2. Enter valid email and password
+  13 |     const loginBody = DataManager.testData.getValidLoginBody();
+  14 |     console.log('Login attempt with email:', loginBody.getEmail());
+  15 |     await pageManager.getLoginPage().fillLoginForm(loginBody);
+  16 |
+  17 |     // 3. Click "Sign In" button
+  18 |     await pageManager.getLoginPage().clickSignInButton();
+  19 |
+  20 |     // 4. Verify redirection to MFA Setup page
+  21 |     const currentUrl = await pageManager.getLoginPage().getCurrentUrl();
+  22 |     console.log('Current URL:', currentUrl);
+> 23 |     expect(currentUrl).toContain('/mfa');
+     |                        ^ Error: expect(received).toContain(expected) // indexOf
+  24 | });
+```

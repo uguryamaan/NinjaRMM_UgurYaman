@@ -1,0 +1,86 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Windows Security ile Login Testi
+- Location: C:\Users\User\Desktop\yeni\tests\windows-security-login.spec.ts:3:1
+
+# Error details
+
+```
+TimeoutError: page.fill: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('input[type="email"]')
+
+    at C:\Users\User\Desktop\yeni\tests\windows-security-login.spec.ts:8:14
+```
+
+# Page snapshot
+
+```yaml
+- link "logo":
+  - img "logo"
+- heading [level=2]
+- text: Email
+- textbox
+- text: Password
+- textbox
+- checkbox "Keep me signed in"
+- text: Keep me signed in
+- button "Sign In"
+- link "Forgot your password?"
+- link "Do not have an account?"
+- text: NinjaOne LLC © 2014-2025
+- link "Contact us"
+- dialog
+- dialog
+- dialog
+- dialog
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '@playwright/test';
+   2 |
+   3 | test('Windows Security ile Login Testi', async ({ page }) => {
+   4 |   // Login sayfasına git
+   5 |   await page.goto('https://app.ninjarmm.com/auth/');
+   6 |   
+   7 |   // Login formunu doldur
+>  8 |   await page.fill('input[type="email"]', process.env.TEST_USER_EMAIL || '');
+     |              ^ TimeoutError: page.fill: Timeout 15000ms exceeded.
+   9 |   await page.fill('input[type="password"]', process.env.TEST_USER_PASSWORD || '');
+  10 |   
+  11 |   // Login butonuna tıkla
+  12 |   await page.click('button[type="submit"]');
+  13 |   
+  14 |   // Sayfanın yüklenmesini bekle
+  15 |   await page.waitForLoadState('networkidle');
+  16 |   
+  17 |   // Windows Security popup'ı için özel işlem
+  18 |   try {
+  19 |     const dialog = await page.waitForEvent('dialog', { timeout: 5000 });
+  20 |     await dialog.accept();
+  21 |   } catch (error) {
+  22 |     console.log('Windows Security popup görünmedi veya otomatik olarak kabul edildi');
+  23 |   }
+  24 |   
+  25 |   // MFA sayfasının yüklenmesini bekle
+  26 |   await page.waitForLoadState('networkidle');
+  27 |   
+  28 |   // URL'de mfa parametresinin olduğunu kontrol et
+  29 |   const currentUrl = page.url();
+  30 |   console.log('Current URL:', currentUrl);
+  31 |   
+  32 |   // MFA sayfasının yüklenmesini bekle
+  33 |   await page.waitForSelector('text=Two-Factor Authentication', { timeout: 10000 });
+  34 |   
+  35 |   // Başarılı login sonrası elementlerin görünür olduğunu kontrol et
+  36 |   await expect(page.locator('text=Two-Factor Authentication')).toBeVisible();
+  37 | }); 
+```

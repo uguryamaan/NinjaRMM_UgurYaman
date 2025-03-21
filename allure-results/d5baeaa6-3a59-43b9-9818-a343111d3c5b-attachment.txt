@@ -1,0 +1,2 @@
+Login attempt with email: ugur.yamaan@gmail.com
+Current URL: https://app.ninjarmm.com/auth/#/login/
