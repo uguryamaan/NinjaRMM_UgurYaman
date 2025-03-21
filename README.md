@@ -1,6 +1,6 @@
 # NinjaRMM Test Automation Framework
 
-This project is a test automation framework for the NinjaOne application, built using Playwright and TypeScript. It follows modern testing practices and implements the Page Object Model (POM) design pattern.
+This project is a test automation framework for the NinjaRMM application, built using Playwright and TypeScript. It follows modern testing practices and implements the Page Object Model (POM) design pattern.
 
 ## 🚀 Features
 
